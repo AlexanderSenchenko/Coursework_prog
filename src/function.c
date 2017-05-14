@@ -14,7 +14,7 @@ char *input()
 
 //wtf? почему не работает, если это дано как теория для курсовой
 //найс ошибки в примере + я даун
-int* compute_prefix_f(const char *p)
+int *compute_prefix_f(const char *p)
 {
 	int m = strlen(p) - 1, k = 0, *pi;
 	pi = malloc(sizeof(int) * m);
@@ -34,35 +34,40 @@ int* compute_prefix_f(const char *p)
 	return pi;
 }
 
-/*int compute_good_suffix(const char *p)
+char *revert(const char *p)
 {
-	int pi = compute_prefix_f(p);
-	char *revert_p = revert(p);
-	int pi_rev = compute_prefix_f(revert_p);
-	m = strlen(path);
-	int gp[m];
-	for (int k = 0; k < m; k++) {
-		gp[k] = m - pi[m];
+	int len = strlen(p) - 1;
+	char *p_rev = malloc(sizeof(char) * len);
+	for (int i = 0; i < len; i++) {
+		p_rev[i] = p[len - i - 1];
 	}
-	for (int k = 0; k < m; k++) {
-		j = m - k;
+	p_rev[len + 1] = '\n';
+	return p_rev;
+}
+
+int *compute_good_suffix(const char *p)
+{
+	int *pi, *pi_rev, *arr_suf, j, k_rev, len;
+	char *p_rev;
+
+	pi = compute_prefix_f(p);
+	p_rev = revert(p);
+	pi_rev = compute_prefix_f(p_rev);
+	len = strlen(p) - 1;
+	arr_suf = malloc(sizeof(int) * len);
+
+	for (int k = 0; k < len; k++) {
+		arr_suf[k] = len - pi[k];
+	}
+	for (int k = 0; k < len; k++) {
+		j = len - k;
 		k_rev = 1;
-		while (k_rev <= m && pi_rev[k_rev] != j) {
-			k_rev = k + 1;
+		while (k_rev <= len && pi_rev[k_rev] != j) {
+			k_rev++;
 		}
 		if (pi_rev[k_rev] == j) {
-			gp[k] = k_rev - m - k;
+			arr_suf[k] = k_rev - len - k;
 		}
 	}
-	return g
-}*/
-
-/*char *revert(const char *p)
-{
-	int len = strlen(p);
-	char *rezert_p = malloc(sizeof(char) * len);
-	for (int i = 0; i < len; i++) {
-		revert_p[i] = p[len - i];
-	}
-	return revert_p;
-}*/
+	return arr_suf;
+}

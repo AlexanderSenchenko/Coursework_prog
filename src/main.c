@@ -1,5 +1,4 @@
 #include <stdio.h>
-//#include <stdlib.h>
 #include <string.h>
 #include "main.h"
 
@@ -15,7 +14,7 @@ int main()
 		return 0;
 	}
 	char *path, *text = NULL;
-	int *pi;
+	int *pi, *arr_suf;
 	size_t len = 0;
 
 	path = input();
@@ -32,8 +31,14 @@ int main()
 		return 0;
 	}
 
-	for (int i = 0; i < 11; i++) {
+	for (int i = 0; i < strlen(text) - 1; i++) {
 		printf("%d ", pi[i]);
+	}
+	printf("\n");
+
+	arr_suf = compute_good_suffix(text);
+	for (int i = 0; i < strlen(text) - 1; i++) {
+		printf("%d ", arr_suf[i]);
 	}
 	printf("\n");
 
