@@ -37,11 +37,11 @@ int *compute_prefix_f(const char *p)
 char *revert(const char *p)
 {
 	int len = strlen(p) - 1;
-	char *p_rev = malloc(sizeof(char) * len);
+	char *p_rev = malloc(sizeof(char) * len + 1);
 	for (int i = 0; i < len; i++) {
 		p_rev[i] = p[len - i - 1];
 	}
-	p_rev[len + 1] = '\n';
+	p_rev[len] = '\n';
 	return p_rev;
 }
 
@@ -51,22 +51,36 @@ int *compute_good_suffix(const char *p)
 	char *p_rev;
 
 	pi = compute_prefix_f(p);
+	for (int i = 0; i < strlen(p) - 1; i++) {
+		printf("%d ", pi[i]);
+	}
+	printf("\n");
+
 	p_rev = revert(p);
+	printf("%s", p_rev);
+
 	pi_rev = compute_prefix_f(p_rev);
+	for (int i = 0; i < strlen(p) - 1; i++) {
+		printf("%d ", pi_rev[i]);
+	}
+	printf("\n");
+
 	len = strlen(p) - 1;
+	printf("%d\n", len);
+
 	arr_suf = malloc(sizeof(int) * len);
 
 	for (int k = 0; k < len; k++) {
-		arr_suf[k] = len - pi[k];
+		arr_suf[k] = len - pi[len - 1];
 	}
 	for (int k = 0; k < len; k++) {
 		j = len - k;
-		k_rev = 1;
+		k_rev = 0;
 		while (k_rev <= len && pi_rev[k_rev] != j) {
 			k_rev++;
 		}
 		if (pi_rev[k_rev] == j) {
-			arr_suf[k] = k_rev - len - k;
+			arr_suf[k] = k_rev - (len - 1 - k);
 		}
 	}
 	return arr_suf;

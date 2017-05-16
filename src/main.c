@@ -7,34 +7,22 @@
 //в плане того что она сама занимается выделением и 
 //перераспределением памяти при считывании текста.
 //Так же был кондидат fread.
-int main()
+int main(int argc, char *argv[])
 {
 	FILE *in = fopen("test.txt", "r");
 	if (in == NULL) {
 		return 0;
 	}
 	char *path, *text = NULL;
-	int *pi, *arr_suf;
+	int *arr_suf;
 	size_t len = 0;
 
-	path = input();
-	if (path == NULL) {
-		return 0;
-	}
+	path = argv[1];
 	printf("%s", path);
+	printf("\n");
 
 	getline(&text, &len, in);
 	printf("%s", text);
-
-	pi = compute_prefix_f(text);
-	if (pi == NULL) {
-		return 0;
-	}
-
-	for (int i = 0; i < strlen(text) - 1; i++) {
-		printf("%d ", pi[i]);
-	}
-	printf("\n");
 
 	arr_suf = compute_good_suffix(text);
 	for (int i = 0; i < strlen(text) - 1; i++) {
