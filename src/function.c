@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 char *input()
 {
@@ -10,6 +11,41 @@ char *input()
 	}
 	fgets(path, 20, stdin);
 	return path;
+}
+
+int hash_f(const char *word)
+{
+	unsigned int h = 0;
+	int n = strlen(word), m = n , d = 7;
+	for (int i = 0; i < n; i++, m--) {
+		if (word[i] == '\n') {
+			continue;
+		}
+		h += word[i] * pow(d, m);
+	}
+	return h;
+}
+
+void search(const char *word, const char *text)
+{
+	int n_text = strlen(text) - 1, buf_hash = 0;
+	int n_word = strlen(word), h_word;
+	char *cpy = malloc(sizeof(char) * n_word);
+	strncpy(cpy, text, n_word);
+	h_word = hash_f(word);
+	printf("%d\n", h_word);
+	for (int i = 0; i < n_text - n_word; i++) {
+		if (buf_hash != 0) {
+			cpy[i + n_word]
+			buf_hash += hash_f(&cpy[i]);
+		} else {
+			buf_hash = hash_f(cpy);
+		}
+		printf("%d\n", buf_hash);
+		if (buf_hash == h_word) {
+			printf("%d\n", i);
+		}
+	}
 }
 
 //wtf? почему не работает, если это дано как теория для курсовой
@@ -74,13 +110,13 @@ int *compute_good_suffix(const char *p)
 		arr_suf[k] = len - pi[len - 1];
 	}
 	for (int k = 0; k < len; k++) {
-		j = len - k;
+		j = len - k - 1;
 		k_rev = 0;
-		while (k_rev <= len && pi_rev[k_rev] != j) {
+		while (k_rev < len && pi_rev[k_rev] != j) {
 			k_rev++;
 		}
 		if (pi_rev[k_rev] == j) {
-			arr_suf[k] = k_rev - (len - 1 - k);
+			arr_suf[k] = k_rev - (len - k - 1);
 		}
 	}
 	return arr_suf;

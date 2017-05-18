@@ -13,22 +13,26 @@ int main(int argc, char *argv[])
 	if (in == NULL) {
 		return 0;
 	}
-	char *path, *text = NULL;
-	int *arr_suf;
+	char *word, *text = NULL;
+	//int *arr_suf;
 	size_t len = 0;
 
-	path = argv[1];
-	printf("%s", path);
+	word = argv[1];
+	printf("%s", word);
 	printf("\n");
 
 	getline(&text, &len, in);
 	printf("%s", text);
 
-	arr_suf = compute_good_suffix(text);
+	printf("%d\n", hash_f(word));
+
+	search(word, text);
+
+	/*arr_suf = compute_good_suffix(text);
 	for (int i = 0; i < strlen(text) - 1; i++) {
 		printf("%d ", arr_suf[i]);
 	}
-	printf("\n");
+	printf("\n");*/
 
 	fclose(in);
 	return 0;
