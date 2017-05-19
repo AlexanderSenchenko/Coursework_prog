@@ -30,27 +30,29 @@ void search(const char *word, const char *text)
 {
 	int n_text = strlen(text) - 1, buf_hash = 0;
 	int n_word = strlen(word), h_word;
-	char *cpy = malloc(sizeof(char) * n_word);
-	strncpy(cpy, text, n_word);
+	char *cpy = malloc(sizeof(char) * n_word), buf[1];
+
+	strncpy(cpy, text, n_text);
 	h_word = hash_f(word);
-	printf("%d\n", h_word);
+	//printf("%d\n", h_word);
+
 	for (int i = 0; i < n_text - n_word; i++) {
-		if (buf_hash != 0) {
-			cpy[i + n_word]
-			buf_hash += hash_f(&cpy[i]);
-		} else {
-			buf_hash = hash_f(cpy);
-		}
-		printf("%d\n", buf_hash);
+		buf[0] = cpy[i + n_word];
+		cpy[i + n_word] = '\0';
+		buf_hash = hash_f(&cpy[i]);
+
 		if (buf_hash == h_word) {
-			printf("%d\n", i);
+			if (strcmp(word, &cpy[i]) == 0) {
+				printf("%d\n", i);
+			}
 		}
+
+		cpy[i + n_word] = buf[0];
 	}
+	//free(cpy);
 }
 
-//wtf? почему не работает, если это дано как теория для курсовой
-//найс ошибки в примере + я даун
-int *compute_prefix_f(const char *p)
+/*int *compute_prefix_f(const char *p)
 {
 	int m = strlen(p) - 1, k = 0, *pi;
 	pi = malloc(sizeof(int) * m);
@@ -120,4 +122,4 @@ int *compute_good_suffix(const char *p)
 		}
 	}
 	return arr_suf;
-}
+}*/

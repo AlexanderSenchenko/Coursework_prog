@@ -1,28 +1,23 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "main.h"
 
-//Разобраться как точно работае функция getline.
-//По первым ощущениям очень упрощает жизнь,
-//в плане того что она сама занимается выделением и 
-//перераспределением памяти при считывании текста.
-//Так же был кондидат fread.
 int main(int argc, char *argv[])
 {
-	FILE *in = fopen("test.txt", "r");
+	FILE *in = fopen("text.txt", "r");
 	if (in == NULL) {
 		return 0;
 	}
 	char *word, *text = NULL;
-	//int *arr_suf;
 	size_t len = 0;
 
 	word = argv[1];
-	printf("%s", word);
-	printf("\n");
 
 	getline(&text, &len, in);
 	printf("%s", text);
+
+	fclose(in);
 
 	printf("%d\n", hash_f(word));
 
@@ -34,7 +29,8 @@ int main(int argc, char *argv[])
 	}
 	printf("\n");*/
 
-	fclose(in);
+	//free(text);
+	//fclose(in);
 	return 0;
 }
 
