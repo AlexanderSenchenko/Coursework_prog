@@ -1,2 +1,2 @@
 all:
-	gcc -Wall -g -o main src/*.c -lm
+	gcc -Wall -Werror -g -o main src/*.c -lm

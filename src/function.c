@@ -3,17 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <dirent.h>
-#include <sys/stat.h>
-
-char *input()
-{
-	char *path = malloc(sizeof(char) * 20);
-	if (path == NULL) {
-		return NULL;
-	}
-	fgets(path, 20, stdin);
-	return path;
-}
+#include <sys/types.h>
 
 unsigned int hash_f(const char *word)
 {
@@ -36,7 +26,6 @@ void search(const char *word, const char *text)
 
 	strncpy(cpy, text, n_text);
 	h_word = hash_f(word);
-	//printf("%d\n", h_word);
 
 	for (int i = 0; i < n_text - n_word; i++) {
 		buf[0] = cpy[i + n_word];
@@ -45,7 +34,7 @@ void search(const char *word, const char *text)
 
 		if (buf_hash == h_word) {
 			if (strcmp(word, &cpy[i]) == 0) {
-				printf("%d\n", i);
+				printf("///%d///\n", i);
 			}
 		}
 
@@ -54,90 +43,53 @@ void search(const char *word, const char *text)
 	//free(cpy);
 }
 
-int crawling_dir()
+void input(const char *file, const char *word)
 {
-	struct stat buf;
-	DIR *dir = opendir("search");
-	if (dir == NULL) {
-		return 0;
+	FILE *in = fopen(file, "r");
+	if (in == NULL) {
+		fclose(in);
+		return;
+	}
+	char *text = NULL;
+	size_t len = 0;
+	
+	getline(&text, &len, in);
+
+	search(word, text);
+	//free(text);
+	fclose(in);
+}
+
+int crawling_dir(const char *direct, const char *word)
+{
+	struct dirent *entry;
+	DIR *dir = opendir(direct);
+	if (!dir) {
+		perror(direct);
+		closedir(dir);
+		return -1;
 	}
 
-	stat("search", &buf);
-	printf("Size of the file is: %ld\n", buf.st_size);
+	perror(direct);
+
+	while ((entry = readdir(dir)) != NULL) {
+		if (!strcmp(entry->d_name, ".")) {
+			printf("\t\t---%s---\n", entry->d_name);
+			continue;
+		} else if (!strcmp(entry->d_name, "..")) {
+			printf("\t\t---%s---\n", entry->d_name);
+			continue;
+		}
+		if (entry->d_type == 4) {
+			printf("dir %s\n", entry->d_name);
+			printf("%d\n", crawling_dir(entry->d_name, word));
+		} else {
+			printf("file\n");
+		//	input(entry->d_name, word);
+		}
+	}
 
 	closedir(dir);
 
 	return 0;
 }
-
-/*int *compute_prefix_f(const char *p)
-{
-	int m = strlen(p) - 1, k = 0, *pi;
-	pi = malloc(sizeof(int) * m);
-	if (pi == NULL) {
-		return NULL;
-	}
-	pi[0] = 0;
-	for (int q = 1; q < m; q++) {
-		while (k > 0 && p[k] != p[q]) {
-			k = pi[k];
-		}
-		if (p[k] == p[q]) {
-			k++;
-		}
-		pi[q] = k;
-	}
-	return pi;
-}
-
-char *revert(const char *p)
-{
-	int len = strlen(p) - 1;
-	char *p_rev = malloc(sizeof(char) * len + 1);
-	for (int i = 0; i < len; i++) {
-		p_rev[i] = p[len - i - 1];
-	}
-	p_rev[len] = '\n';
-	return p_rev;
-}
-
-int *compute_good_suffix(const char *p)
-{
-	int *pi, *pi_rev, *arr_suf, j, k_rev, len;
-	char *p_rev;
-
-	pi = compute_prefix_f(p);
-	for (int i = 0; i < strlen(p) - 1; i++) {
-		printf("%d ", pi[i]);
-	}
-	printf("\n");
-
-	p_rev = revert(p);
-	printf("%s", p_rev);
-
-	pi_rev = compute_prefix_f(p_rev);
-	for (int i = 0; i < strlen(p) - 1; i++) {
-		printf("%d ", pi_rev[i]);
-	}
-	printf("\n");
-
-	len = strlen(p) - 1;
-	printf("%d\n", len);
-
-	arr_suf = malloc(sizeof(int) * len);
-
-	for (int k = 0; k < len; k++) {
-		arr_suf[k] = len - pi[len - 1];
-	}
-	for (int k = 0; k < len; k++) {
-		j = len - k - 1;
-		k_rev = 0;
-		while (k_rev < len && pi_rev[k_rev] != j) {
-			k_rev++;
-		}
-		if (pi_rev[k_rev] == j) {
-			arr_suf[k] = k_rev - (len - k - 1);
-		}
-	}
-	return arr_suf;
-}*/
