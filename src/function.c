@@ -15,7 +15,7 @@ char *input()
 	return path;
 }
 
-int hash_f(const char *word)
+unsigned int hash_f(const char *word)
 {
 	unsigned int h = 0;
 	int n = strlen(word), m = n , d = 7;

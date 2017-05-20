@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
 	fclose(in);
 
-	//printf("%d\n", hash_f(word));
+	printf("%u\n", hash_f(word));
 
 	search(word, text);
 
