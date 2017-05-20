@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 char *input()
 {
@@ -50,6 +52,22 @@ void search(const char *word, const char *text)
 		cpy[i + n_word] = buf[0];
 	}
 	//free(cpy);
+}
+
+int crawling_dir()
+{
+	struct stat buf;
+	DIR *dir = opendir("search");
+	if (dir == NULL) {
+		return 0;
+	}
+
+	stat("search", &buf);
+	printf("Size of the file is: %ld\n", buf.st_size);
+
+	closedir(dir);
+
+	return 0;
 }
 
 /*int *compute_prefix_f(const char *p)

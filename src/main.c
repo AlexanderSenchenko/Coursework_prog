@@ -17,9 +17,11 @@ int main(int argc, char *argv[])
 	getline(&text, &len, in);
 	printf("%s", text);
 
+	printf("%d\n", crawling_dir());
+
 	fclose(in);
 
-	printf("%d\n", hash_f(word));
+	//printf("%d\n", hash_f(word));
 
 	search(word, text);
 
