@@ -20,11 +20,12 @@ unsigned int hash_f(const char *word)
 
 void search(const char *word, const char *text)
 {
+	printf("---Search---\n");
 	int n_text = strlen(text) - 1, buf_hash = 0;
 	int n_word = strlen(word), h_word;
-	char *cpy = malloc(sizeof(char) * n_word), buf[1];
+	char cpy[n_text], buf[1];
 
-	strncpy(cpy, text, n_text);
+	strcpy(cpy, text);
 	h_word = hash_f(word);
 
 	for (int i = 0; i < n_text - n_word; i++) {
@@ -34,39 +35,62 @@ void search(const char *word, const char *text)
 
 		if (buf_hash == h_word) {
 			if (strcmp(word, &cpy[i]) == 0) {
-				printf("///%d///\n", i);
+				printf("#%d#\n", i);
 			}
 		}
 
 		cpy[i + n_word] = buf[0];
 	}
-	//free(cpy);
+	printf("---End search---\n");
 }
 
 void input(const char *file, const char *word)
 {
+	printf("\n/////Add text in: %s/////\n", file);
 	FILE *in = fopen(file, "r");
-	if (in == NULL) {
-		fclose(in);
+	if (!in) {
+		printf("Error begin file: %s\n", file);
 		return;
+	} else {
+		printf("Begin file: %s\n", file);
 	}
-	char *text = NULL;
-	size_t len = 0;
-	
-	getline(&text, &len, in);
+	char *text, *estr;
+	text = malloc(sizeof(char) * 50);
+	if (text == NULL) {
+		return;
+	}	
 
+	estr = fgets(text, 50, in);
+	if (estr == NULL) {
+		if (feof(in) != 0) {
+			printf("Fail read: %s\n", file);
+		} else {
+			printf("Error fail read: %s\n",file);
+		}
+	}
+
+	printf("Text: %s", text);
+	printf("Len text: %d\n", strlen(text));
+
+	if (fclose(in) == EOF) {
+		printf("Error file end: %s\n", file);
+	} else {
+		printf("File end: %s\n", file);
+	}
+		
 	search(word, text);
-	//free(text);
-	fclose(in);
+	free(text);
+	printf("/////End text: %s/////\n", file);
 }
 
 int crawling_dir(const char *direct, const char *word)
 {
+	printf("\n|||||Crawling dir: %s|||||\n", direct);
 	struct dirent *entry;
 	DIR *dir = opendir(direct);
 	if (!dir) {
 		perror(direct);
-		closedir(dir);
+		printf("|||||End crawling dir: %s|||||\n\n", direct);
 		return -1;
 	}
 
@@ -74,22 +98,21 @@ int crawling_dir(const char *direct, const char *word)
 
 	while ((entry = readdir(dir)) != NULL) {
 		if (!strcmp(entry->d_name, ".")) {
-			printf("\t\t---%s---\n", entry->d_name);
 			continue;
 		} else if (!strcmp(entry->d_name, "..")) {
-			printf("\t\t---%s---\n", entry->d_name);
 			continue;
 		}
-		if (entry->d_type == 4) {
+		if (entry->d_type & DT_DIR) {
 			printf("dir %s\n", entry->d_name);
 			printf("%d\n", crawling_dir(entry->d_name, word));
 		} else {
-			printf("file\n");
+			printf("%s\n", entry->d_name);
 		//	input(entry->d_name, word);
 		}
 	}
 
 	closedir(dir);
+	printf("|||||End crawling dir: %s|||||\n", direct);
 
 	return 0;
 }
