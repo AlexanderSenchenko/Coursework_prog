@@ -8,11 +8,11 @@ int main(int argc, char *argv[])
 	char *word, *dir;
 	word = argv[1];
 	dir = argv[2];
-	printf("Search '%s' in dir %s\n", word, dir);
+	printf("Search '%s' in directory %s\n", word, dir);
 
-	//input("search/text.txt", word);
-
-	printf("Crawling %d\n", crawling_dir(dir, word));
+	if (crawling_dir(dir, word) == -1) {
+		perror(dir);
+	}
 	return 0;
 }
 

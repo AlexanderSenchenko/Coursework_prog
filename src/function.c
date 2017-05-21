@@ -20,11 +20,10 @@ unsigned int hash_f(const char *word)
 
 void search(const char *word, const char *text)
 {
-	printf("\n---Search---\n");
 	int n_text = strlen(text), buf_hash = 0;
 	int n_word = strlen(word), h_word;
 	char cpy[n_text], buf[1];
-
+printf("%s", text);
 	strcpy(cpy, text);
 	h_word = hash_f(word);
 
@@ -35,85 +34,61 @@ void search(const char *word, const char *text)
 
 		if (buf_hash == h_word) {
 			if (strcmp(word, &cpy[i]) == 0) {
-				printf("#%d#\n", i);
+				printf("%d\n", i);
 			}
 		}
-
 		cpy[i + n_word] = buf[0];
 	}
-	printf("---End search---\n\n");
 }
 
 void input(const char *file, const char *word)
 {
-	printf("\n/////Add text in: %s/////\n", file);
+	
 	FILE *in = fopen(file, "r");
 	if (!in) {
-		printf("Error begin file: %s\n", file);
-		printf("/////End text: %s/////\n\n", file);
+		perror(file);
 		return;
-	} else {
-		printf("Begin file: %s\n", file);
 	}
 
 	fseek(in, 0, SEEK_END);
 	long int len = ftell(in);
-	//printf("%li\n", len);
 	rewind(in);
 
 	char *text = malloc(sizeof(char) * len);
-	fread(text, sizeof(char), len, in);
-	if (len != 0) {
-		printf("%s\n", text);
+	while (fgets(text, len, in)) {
+		search(word, text);
 	}
 
 	if (fclose(in) == EOF) {
 		printf("Error file end: %s\n", file);
-	} else {
-		printf("File end: %s\n", file);
+		perror(file);
 	}
-		
-	search(word, text);
+
 	free(text);
-	printf("/////End text: %s/////\n", file);
 }
 
 char *create_new_path(const char *external_dir, const char *interior_dir) {
-	//printf("\n###Create###\n");
 	int ex_dir = strlen(external_dir);
 	int int_dir = strlen(interior_dir);
 	int new_path = ex_dir + int_dir;
-	char *new_dir = malloc(sizeof(char) * new_path);
-
-	//printf("\nDir %s\n", interior_dir);
-	//printf("Len 1 dir: %d\n", ex_dir);
-	//printf("Len 2 dir: %d\n", int_dir);
-	//printf("Len New path: %d\n", new_path);
+	char *new_dir = malloc(sizeof(char) * new_path * 2);
 
 	strcpy(new_dir, external_dir);
 	new_dir[ex_dir] = '/';
-	//printf("Border: %c\n", new_dir[ex_dir]);
 	strcpy(&new_dir[ex_dir + 1], interior_dir);
 
-	//printf("New dir: %s\n", new_dir);
-	//printf("Len dir cpy: %d\n", strlen(new_dir));
-	//printf("\n###End Create###\n");
 	return new_dir;
 }
 
 int crawling_dir(const char *direct, const char *word)
 {
-	printf("\n|||||Crawling dir: %s|||||\n", direct);
 	struct dirent *entry;
 	char *new_path;
 	DIR *dir = opendir(direct);
 	if (!dir) {
 		perror(direct);
-		printf("|||||End crawling dir: %s|||||\n", direct);
 		return -1;
 	}
-
-	perror(direct);
 
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_name[0] == '.') {
@@ -121,20 +96,17 @@ int crawling_dir(const char *direct, const char *word)
 		}
 		if (entry->d_type & DT_DIR) {
 			new_path = create_new_path(direct, entry->d_name);
-			//printf("New path: %s\n", new_path);
 			crawling_dir(new_path, word);
 			free(new_path);
 		} else {
-			//printf("\nFile: %s", entry->d_name);
 			new_path = create_new_path(direct, entry->d_name);
-			//printf("New path: %s\n", new_path);
+			printf("\nPath: %s\n", new_path);
 			input(new_path, word);
 			free(new_path);
 		}
 	}
 
 	closedir(dir);
-	printf("\n|||||End crawling dir: %s|||||\n", direct);
 
 	return 0;
 }
