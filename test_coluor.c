@@ -10,6 +10,7 @@ char colors[][5] = {
 "0;35", /* Purple */ "1;35", /* Bold Purple */
 "0;36", /* Cyan */ "1;36" /*Bold Cyan */ };
 int colors_sz = sizeof(colors) / sizeof(colors[0]);
+
 int main()
 {
 	char text1[] = "This is demonstration text\n";
