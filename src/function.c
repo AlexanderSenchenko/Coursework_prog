@@ -20,7 +20,7 @@ unsigned int hash_f(const char *word)
 
 void search(const char *word, const char *text)
 {
-	printf("---Search---\n");
+	printf("\n---Search---\n");
 	int n_text = strlen(text) - 1, buf_hash = 0;
 	int n_word = strlen(word), h_word;
 	char cpy[n_text], buf[1];
@@ -41,7 +41,7 @@ void search(const char *word, const char *text)
 
 		cpy[i + n_word] = buf[0];
 	}
-	printf("---End search---\n");
+	printf("---End search---\n\n");
 }
 
 void input(const char *file, const char *word)
@@ -50,6 +50,7 @@ void input(const char *file, const char *word)
 	FILE *in = fopen(file, "r");
 	if (!in) {
 		printf("Error begin file: %s\n", file);
+		printf("/////End text: %s/////\n\n", file);
 		return;
 	} else {
 		printf("Begin file: %s\n", file);
@@ -83,6 +84,27 @@ void input(const char *file, const char *word)
 	printf("/////End text: %s/////\n", file);
 }
 
+char *create_new_path(const char *external_dir, const char *interior_dir) {
+	int ex_dir = strlen(external_dir);
+	int int_dir = strlen(interior_dir);
+	int new_path = ex_dir + int_dir;
+	char *new_dir = malloc(sizeof(char) * new_path);
+
+	printf("\nDir %s\n", interior_dir);
+	printf("Len 1 dir: %d\n", ex_dir);
+	printf("Len 2 dir: %d\n", int_dir);
+	printf("Len New path: %d\n", new_path);
+
+	strcpy(new_dir, external_dir);
+	new_dir[ex_dir] = '/';
+	printf("Border: %c\n", new_dir[ex_dir]);
+	strcpy(&new_dir[ex_dir + 1], interior_dir);
+
+	printf("New dir: %s\n", new_dir);
+	printf("Len dir cpy: %d\n", strlen(new_dir));
+	return new_dir;	
+}
+
 int crawling_dir(const char *direct, const char *word)
 {
 	printf("\n|||||Crawling dir: %s|||||\n", direct);
@@ -90,7 +112,7 @@ int crawling_dir(const char *direct, const char *word)
 	DIR *dir = opendir(direct);
 	if (!dir) {
 		perror(direct);
-		printf("|||||End crawling dir: %s|||||\n\n", direct);
+		printf("|||||End crawling dir: %s|||||\n", direct);
 		return -1;
 	}
 
@@ -103,16 +125,19 @@ int crawling_dir(const char *direct, const char *word)
 			continue;
 		}
 		if (entry->d_type & DT_DIR) {
-			printf("dir %s\n", entry->d_name);
-			printf("%d\n", crawling_dir(entry->d_name, word));
+			char *new_path;
+			new_path = create_new_path(direct, entry->d_name);
+			printf("New path: %s\n", new_path);
+			crawling_dir(new_path, word);
+			free(new_path);
 		} else {
-			printf("%s\n", entry->d_name);
-		//	input(entry->d_name, word);
+			printf("\nFile: %s", entry->d_name);
+			//input(entry->d_name, word);
 		}
 	}
 
 	closedir(dir);
-	printf("|||||End crawling dir: %s|||||\n", direct);
+	printf("\n|||||End crawling dir: %s|||||\n", direct);
 
 	return 0;
 }
