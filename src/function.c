@@ -30,6 +30,24 @@ unsigned int hash_f(const char *word)
 	return h;
 }
 
+void output(const char* text, int z, int i, int n_word) {
+	int len = strlen(text);
+	//char cpy[len * 2];
+	//printf("%s", text);
+	for (int j = 0; j < i; j++) {
+		printf("%c", text[j]);
+	}
+	for (int j = i; j < n_word + i; j++) {
+		printf("%s%sm", CSI, colors[2]);
+		printf("%c", text[j]);
+		printf("%s0m", CSI);
+	}
+	for (int j = n_word + i; j < len; j++) {
+		printf("%c", text[j]);
+	}
+	printf("\n");
+}
+
 void search(const char *word, const char *text)
 {
 	int n_text = strlen(text), buf_hash = 0;
@@ -39,23 +57,24 @@ void search(const char *word, const char *text)
 	strcpy(cpy, text);
 	h_word = hash_f(word);
 //printf("%s%sm", CSI, colors[2]);
-printf("%s", text);
 //printf("%s0m", CSI);
-	for (int i = 0; i < n_text - n_word; i++) {
+	for (int i = 0, z = 0; i < n_text - n_word; i++) {
 		buf[0] = cpy[i + n_word];
 		cpy[i + n_word] = '\0';
 		buf_hash = hash_f(&cpy[i]);
 
+		if (cpy[i] == ' ') {
+			z = i + 1;
+		}
+
 		if (buf_hash == h_word) {
 			if (strcmp(word, &cpy[i]) == 0) {
-				printf("\n/////%d\n", i);
+				output(text, z, i, n_word);
 			}
 		}
 
 		cpy[i + n_word] = buf[0];
-		//printf("%c", text[i]);
 	}
-	//printf("\n");
 }
 
 void input(const char *file, const char *word)
