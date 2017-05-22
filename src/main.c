@@ -10,9 +10,11 @@ int main(int argc, char *argv[])
 	dir = argv[2];
 	printf("Search '%s' in directory %s\n", word, dir);
 
-	if (crawling_dir(dir, word) == -1) {
-		perror(dir);
-	}
+	input("Recursive/src/fib.c", word);
+
+	//if (crawling_dir(dir, word) == -1) {
+	//	perror(dir);
+	//}
 	return 0;
 }
 
