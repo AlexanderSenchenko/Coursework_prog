@@ -6,15 +6,19 @@
 int main(int argc, char *argv[])
 {
 	char *word, *dir;
+	int result;
 	word = argv[1];
 	dir = argv[2];
 	printf("Search '%s' in directory %s\n", word, dir);
 
-	input("Recursive/src/fib.c", word);
+	result = crawling_dir(dir, word, 0);
+	if (result == -1) {
+		perror(dir);
+	} else {
+		printf("\nTotal words found in derictori %s: %d\n", dir, result);
+	}
 
-	//if (crawling_dir(dir, word) == -1) {
-	//	perror(dir);
-	//}
+	
 	return 0;
 }
 
