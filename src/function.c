@@ -37,6 +37,9 @@ int search(const char *word, const char *text, int line, int all_search, const c
 	int n_word = strlen(word), h_word;
 	char cpy[n_text], buf[1];
 	Results *res = create_res(n_text / n_word);
+	if (res == NULL) {
+		return 0;
+	}
 
 	res->line = line;
 	strcpy(cpy, text);
@@ -61,7 +64,6 @@ int search(const char *word, const char *text, int line, int all_search, const c
 		output_search(res, text, n_word, file);
 	}
 	free_res(res);
-	//printf("%d\n", all_search);
 	return all_search;
 }
 
@@ -70,8 +72,18 @@ void output_search(Results *res, const char *text, int n_word, const char *file)
 	int z = 0;
 	printf("\nPath to file: %s\n", file);
 	printf("Line in file: %d\n", res->line);
+	printf("Column in file: ");
+
+	for (int i = 0; i < res->n_column; i++) {
+		printf("|%d| ", res->column[i] + 1);
+	}
+	printf("\n");
+
 	for (int i = 0; i < res->n_column; i++) {
 		for (int j = z; j < res->column[i]; j++) {
+			if (i == 0 && text[j] == '\t') {
+				continue;
+			}
 			printf("%c", text[j]);
 		}
 		printf("%s%sm", CSI, colors[2]);
@@ -88,11 +100,13 @@ Results *create_res(int n)
 {
 	Results *res = malloc(sizeof(Results));
 	if (res == NULL) {
+		printf("Error allocating memory for structure\n");
 		return NULL;
 	}
 	res->n_column = 0;
 	res->column = malloc(sizeof(int) * n);
 	if (res->column == NULL) {
+		printf("Error allocating memory for the structure element\n");
 		free(res);
 		return NULL;
 	}
@@ -109,15 +123,13 @@ void free_res(Results *res)
 
 int input(const char *file, const char *word)
 {
-	
 	FILE *in = fopen(file, "r");
 	int line = 0, all_search = 0;
 	if (!in) {
 		perror(file);
-		return -1;
+		return 0;
 	}
 
-	
 	fseek(in, 0, SEEK_END);
 	long int len = ftell(in);
 	rewind(in);
@@ -128,13 +140,8 @@ int input(const char *file, const char *word)
 		all_search += search(word, text, line, 0, file);
 	}
 
-	if (fclose(in) == EOF) {
-		printf("Error file end: %s\n", file);
-		perror(file);
-	}
-
+	fclose(in);
 	free(text);
-	//printf("%d\n", all_search);
 	return all_search;
 }
 
@@ -144,6 +151,9 @@ char *create_new_path(const char *external_dir, const char *interior_dir)
 	int int_dir = strlen(interior_dir);
 	int new_path = ex_dir + int_dir;
 	char *new_dir = malloc(sizeof(char) * new_path * 2);
+	if (new_dir == NULL) {
+		return NULL;
+	}
 
 	strcpy(new_dir, external_dir);
 	new_dir[ex_dir] = '/';
@@ -167,6 +177,9 @@ int crawling_dir(const char *direct, const char *word, int all_search)
 		}
 		if (entry->d_type & DT_DIR) {
 			new_path = create_new_path(direct, entry->d_name);
+			if (new_path == NULL) {
+				return 0;
+			}
 			all_search += crawling_dir(new_path, word, all_search);
 			free(new_path);
 		} else {
