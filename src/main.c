@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	if (result == -1) {
 		perror(dir);
 	} else {
-		printf("\nTotal words found in derictori %s: %d\n", dir, result);
+		printf("\nTotal words found in derictory %s: %d\n", dir, result);
 	}	
 	return 0;
 }
