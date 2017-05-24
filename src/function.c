@@ -4,6 +4,7 @@
 #include <math.h>
 #include <dirent.h>
 #include <sys/types.h>
+#include "main.h"
 
 #define CSI "\x1B\x5B"
 
@@ -30,26 +31,12 @@ unsigned int hash_f(const char *word)
 	return h;
 }
 
-void output(const char* text, int z, int i, int n_word) {
-	int len = strlen(text);
-
-	//for (int j = 0; j < i; j++) {
-		
-	//}
-	//for (int j = i; j < n_word + i; j++) {
-		
-	//}
-	for (int j = n_word + i; j < len; j++) {
-		printf("%c", text[j]);
-	}
-	printf("\n");
-}
-
-void search(const char *word, const char *text)
+void search(const char *word, const char *text, int line)
 {
 	int n_text = strlen(text), buf_hash = 0;//, test = 0;
-	int n_word = strlen(word), h_word, z = 0;
+	int n_word = strlen(word), h_word;//, z = 0;
 	char cpy[n_text], buf[1];
+	Results *res = create_res(n_text / n_word);
 
 	strcpy(cpy, text);
 	h_word = hash_f(word);
@@ -62,31 +49,105 @@ void search(const char *word, const char *text)
 
 		if (buf_hash == h_word) {
 			if (strcmp(word, &cpy[i]) == 0) {
-				//printf("###%d###\n", i);
-				for (int j = z; j < i + z; j++) {
+				printf("%s", text);
+				res->column[res->n_column] = i;
+				res->n_column++;
+				/*for (int j = z; j < i; j++) {
 					printf("%c", cpy[j]);
 				}
 				printf("%s%sm", CSI, colors[2]);
 				for (int j = i; cpy[j] != '\0'; j++) {
 					printf("%c", cpy[j]);
 				}
-				printf("%s0m", CSI);
+				printf("%s0m", CSI);*/
 				//for (int j = i + n_word; text[j] != '\0'; j++) {
 				//	printf("%c", text[j]);
 				//}
-				z = i + n_word;
+				//z = i + n_word;
 				//printf("\n");
 				//printf("%d~%d\n", i, test);
 				//printf("%d\n", z + i);
 				//printf("\n");
 			}
 		}
-		i += n_word;
-		cpy[i] = buf[0];
-		if (z != 0) {
-			printf("\n");
-		}	
+		//i += n_word;
+		cpy[i + n_word] = buf[0];
+		//if (z != 0) {
+		//	//printf("\n");
+		//}	
 	
+	}
+	if (res->n_column != 0) {
+		res->line = line;
+		printf("//%d// ", res->line);
+		printf("//%d// ", res->n_column);
+		for (int i = 0; i < res->n_column; i++) {
+			printf("%d ", res->column[i]);
+		}
+		printf("\n");
+		output(res, text, n_word);
+	}
+	free_res(res);
+}
+
+void output(Results *res, const char *text, int n_word)
+{
+	int z = 0;
+	for (int j = z; j < res->column[0]; j++) {
+		printf("%c", text[j]);
+	}
+	printf("%s%sm", CSI, colors[2]);
+	for (int j = res->column[0]; j < res->column[0] + n_word; j++) {
+		printf("%c", text[j]);
+	}
+	printf("%s0m", CSI);
+	z += res->column[0] + n_word;
+	for (int j = z; j < res->column[1]; j++) {
+		printf("%c", text[j]);
+	}
+	printf("%s%sm", CSI, colors[2]);
+	for (int j = res->column[1]; j < res->column[1] + n_word; j++) {
+		printf("%c", text[j]);
+	}
+	printf("%s0m", CSI);
+	printf("\n");
+	z = 0;
+	for (int i = 0; i < res->n_column; i++) {
+		//printf("##%d/%d##", z, res->column[i]);
+		for (int j = z; j < res->column[i]; j++) {
+			printf("%c", text[j]);
+		}
+		printf("%s%sm", CSI, colors[2]);
+		for (int j = res->column[i]; j < res->column[i] + n_word; j++) {
+			printf("%c", text[j]);
+		}
+		printf("%s0m", CSI);
+		z = res->column[i] + n_word;
+	}
+	//printf("\n");
+	printf("%s", &text[z]);
+}
+
+Results *create_res(int n)
+{
+	Results *res = malloc(sizeof(Results));
+	if (res == NULL) {
+		return NULL;
+	}
+	res->n_column = 0;
+	res->column = malloc(sizeof(int) * n);
+	if (res->column == NULL) {
+		free(res);
+		return NULL;
+	}
+	return res;
+}
+
+void free_res(Results *res)
+{
+	if (res != NULL) {
+		free(res->column);
+		free(res);
 	}
 }
 
@@ -94,6 +155,7 @@ void input(const char *file, const char *word)
 {
 	
 	FILE *in = fopen(file, "r");
+	int line = 0;
 	if (!in) {
 		perror(file);
 		return;
@@ -105,7 +167,8 @@ void input(const char *file, const char *word)
 
 	char *text = malloc(sizeof(char) * len);
 	while (fgets(text, len, in)) {
-		search(word, text);
+		line++;
+		search(word, text, line);
 	}
 
 	if (fclose(in) == EOF) {
@@ -116,7 +179,8 @@ void input(const char *file, const char *word)
 	free(text);
 }
 
-char *create_new_path(const char *external_dir, const char *interior_dir) {
+char *create_new_path(const char *external_dir, const char *interior_dir)
+{
 	int ex_dir = strlen(external_dir);
 	int int_dir = strlen(interior_dir);
 	int new_path = ex_dir + int_dir;
