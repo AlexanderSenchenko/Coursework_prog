@@ -4,7 +4,7 @@
 #include <math.h>
 #include <dirent.h>
 #include <sys/types.h>
-#include "main.h"
+#include "rkmatcher.h"
 
 #define CSI "\x1B\x5B"
 
@@ -18,7 +18,7 @@ char colors[][5] = {
 "0;36", /* Cyan */ "1;36" /*Bold Cyan */ };
 int colors_sz = sizeof(colors) / sizeof(colors[0]);
 
-int crawling_dir(const char *direct, const char *word, int all_search)
+int crawling_dir(const char *direct, const char *word, int all_search, int rec)
 {
 	struct dirent *entry;
 	char *new_path;
@@ -31,12 +31,12 @@ int crawling_dir(const char *direct, const char *word, int all_search)
 		if (entry->d_name[0] == '.') {
 			continue;
 		}
-		if (entry->d_type & DT_DIR) {
+		if (entry->d_type & DT_DIR && rec == 1) {
 			new_path = create_new_path(direct, entry->d_name);
 			if (new_path == NULL) {
 				continue;
 			}
-			all_search += crawling_dir(new_path, word, all_search);
+			all_search += crawling_dir(new_path, word, all_search, rec);
 			free(new_path);
 		} else {
 			new_path = create_new_path(direct, entry->d_name);
@@ -194,5 +194,5 @@ void output_search(Results *res, const char *text, int n_word, const char *file)
 		printf("%s0m", CSI);
 		z = res->column[i] + n_word;
 	}
-	printf("%s", &text[z]);
+	printf("%s\n", &text[z]);
 }

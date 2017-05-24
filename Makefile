@@ -1,2 +1,2 @@
 all:
-	gcc -Wall -Werror -g -o main src/*.c -lm
+	gcc -Wall -Werror -g -o rkmatcher src/*.c -lm
