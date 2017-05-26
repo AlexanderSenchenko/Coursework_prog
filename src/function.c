@@ -36,10 +36,13 @@ int crawling_dir(const char *direct, const char *word, int all_search, int rec)
 			if (new_path == NULL) {
 				continue;
 			}
-			all_search += crawling_dir(new_path, word, all_search, rec);
+			all_search = crawling_dir(new_path, word, all_search, rec);
 			free(new_path);
 		} else {
 			new_path = create_new_path(direct, entry->d_name);
+			if (new_path == NULL) {
+				continue;
+			}
 			all_search += input_str(new_path, word);
 			free(new_path);
 		}
